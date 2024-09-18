@@ -5,6 +5,7 @@ import Products from "./components/Shop/Products";
 import { useEffect } from "react";
 import Notification from "./components/UI/Notification";
 import { uiActions } from "./store/ui-reducer";
+import { cartActions } from "./store/cart-reducer";
 
 let isInitial = true;
 
@@ -15,6 +16,71 @@ function App() {
 	);
 
 	const dispatch = useDispatch();
+
+	useEffect(() => {
+		const fetchCartData = async () => {
+			dispatch(uiActions.setShowNotification(true));
+			dispatch(
+				uiActions.showNotification({
+					status: "pending",
+					title: "Fetching ...",
+					message: "Fetching cart data!",
+				})
+			);
+			console.log("fetching");
+
+			try {
+				const response = await fetch(
+					"https://redux-store-5937e-default-rtdb.asia-southeast1.firebasedatabase.app/cart.json"
+				);
+
+				if (!response.ok) {
+					throw new Error("Fetching cart data failed");
+				}
+
+				const data = await response.json();
+				console.log(data);
+
+				const fetchCartData = data.cartList;
+				console.log(fetchCartData);
+
+				dispatch(cartActions.replaceCart(data));
+
+				dispatch(
+					uiActions.showNotification({
+						status: "success",
+						title: "Success!",
+						message: "Fetched cart data successfully!",
+					})
+				);
+				console.log("fetched");
+			} catch (error) {
+				console.log(error);
+				dispatch(
+					uiActions.showNotification({
+						status: "error",
+						title: "Error!",
+						message: "Fetching cart data failed!",
+					})
+				);
+			} finally {
+				setTimeout(() => {
+					dispatch(uiActions.setShowNotification(false));
+					dispatch(
+						uiActions.showNotification({
+							status: " ",
+							title: " ",
+							message: " ",
+						})
+					);
+				}, 1500);
+			}
+		};
+
+		if (isInitial) {
+			fetchCartData();
+		}
+	}, [dispatch]);
 
 	const cart = useSelector((state) => state.cart);
 	const { cartList, totalItems } = cart;
@@ -28,6 +94,7 @@ function App() {
 					message: "Sending cart data!",
 				})
 			);
+			// console.log(isInitial);
 
 			try {
 				const response = await fetch(
@@ -78,6 +145,7 @@ function App() {
 		}
 		postCartData();
 	}, [cartList, totalItems, dispatch]);
+
 	return (
 		<>
 			{notification && notificationIsVisible && (
