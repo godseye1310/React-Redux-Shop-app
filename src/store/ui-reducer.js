@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = { notification: null };
+const initialState = { notification: null, notificationIsVisible: false };
 
 const uiSlice = createSlice({
 	name: "ui",
@@ -12,6 +12,9 @@ const uiSlice = createSlice({
 				title: action.payload.title,
 				message: action.payload.message,
 			};
+		},
+		setShowNotification: (state, action) => {
+			state.notificationIsVisible = action.payload;
 		},
 	},
 });

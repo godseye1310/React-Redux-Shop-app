@@ -10,7 +10,9 @@ let isInitial = true;
 
 function App() {
 	const isCartDisplay = useSelector((state) => state.cart.isCartDisplay);
-	const notification = useSelector((state) => state.ui.notification);
+	const { notification, notificationIsVisible } = useSelector(
+		(state) => state.ui
+	);
 
 	const dispatch = useDispatch();
 
@@ -18,6 +20,7 @@ function App() {
 	const { cartList, totalItems } = cart;
 	useEffect(() => {
 		const postCartData = async () => {
+			dispatch(uiActions.setShowNotification(true));
 			dispatch(
 				uiActions.showNotification({
 					status: "pending",
@@ -25,6 +28,7 @@ function App() {
 					message: "Sending cart data!",
 				})
 			);
+
 			try {
 				const response = await fetch(
 					"https://redux-store-5937e-default-rtdb.asia-southeast1.firebasedatabase.app/cart.json",
@@ -55,9 +59,16 @@ function App() {
 					})
 				);
 			} finally {
-				// setTimeout(() => {
-				// 	dispatch(uiActions.showNotification(null));
-				// }, 1500);
+				setTimeout(() => {
+					dispatch(uiActions.setShowNotification(false));
+					dispatch(
+						uiActions.showNotification({
+							status: "",
+							title: "",
+							message: "",
+						})
+					);
+				}, 1500);
 			}
 		};
 
@@ -69,7 +80,7 @@ function App() {
 	}, [cartList, totalItems, dispatch]);
 	return (
 		<>
-			{notification && (
+			{notification && notificationIsVisible && (
 				<Notification
 					status={notification.status}
 					title={notification.title}
