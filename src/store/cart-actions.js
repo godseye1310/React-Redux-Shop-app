@@ -1,6 +1,8 @@
 import { cartActions } from "./cart-reducer";
 import { uiActions } from "./ui-reducer";
 
+const API_URL =
+	"https://react-api-http-requests-default-rtdb.asia-southeast1.firebasedatabase.app/cart.json";
 export const getCartData = () => {
 	return (dispatch) => {
 		const fetchCartData = async () => {
@@ -14,9 +16,7 @@ export const getCartData = () => {
 			);
 			console.log("fetching");
 			try {
-				const response = await fetch(
-					"https://redux-store-5937e-default-rtdb.asia-southeast1.firebasedatabase.app/cart.json"
-				);
+				const response = await fetch(API_URL);
 				if (!response.ok) {
 					throw new Error("Fetching cart data failed");
 				}
@@ -74,13 +74,10 @@ export const sendCartData = (cart) => {
 			// console.log(isInitial);
 
 			try {
-				const response = await fetch(
-					"https://redux-store-5937e-default-rtdb.asia-southeast1.firebasedatabase.app/cart.json",
-					{
-						method: "PUT",
-						body: JSON.stringify({ cartList, totalItems }),
-					}
-				);
+				const response = await fetch(API_URL, {
+					method: "PUT",
+					body: JSON.stringify({ cartList, totalItems }),
+				});
 
 				if (!response.ok) {
 					throw new Error("Sending cart data failed");
